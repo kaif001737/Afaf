@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Afaf Way Islamic Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:wght@300;400;500;600&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<style>
+  :root {
+    --emerald:    #1b4332;
+    --emerald-mid:#2d6a4f;
+    --emerald-light: #40916c;
+    --gold:       #c9963a;
+    --gold-light: #e8c46a;
+    --cream:      #fdf6e3;
+    --cream-dark: #f0e6c8;
+    --ink:        #1a1209;
+    --muted:      #7a6a4a;
+    --white:      #ffffff;
+    --shadow:     0 8px 40px rgba(27,67,50,0.13);
+    --card-bg:    rgba(255,252,244,0.97);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Raleway', sans-serif;
+    background-color: var(--emerald);
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(201,150,58,0.18) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(64,145,108,0.25) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='rgba(201,150,58,0.07)' stroke-width='1'%3E%3Cpolygon points='40,5 55,20 75,20 62,35 68,55 40,45 12,55 18,35 5,20 25,20'/%3E%3Crect x='20' y='20' width='40' height='40' transform='rotate(45 40 40)'/%3E%3C/g%3E%3C/svg%3E");
+    min-height: 100vh;
+    color: var(--ink);
+  }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    padding: 60px 20px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(27,67,50,0) 0%, rgba(27,67,50,0.6) 100%);
+    pointer-events: none;
+  }
+
+  .header-ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 22px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .ornament-line {
+    height: 1px;
+    width: 70px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+  }
+
+  .ornament-star {
+    color: var(--gold-light);
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .logo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 0 6px rgba(201,150,58,0.2), 0 12px 40px rgba(0,0,0,0.3);
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 24px;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  header h1 {
+    font-family: 'Amiri', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    color: var(--cream);
+    letter-spacing: 0.03em;
+    line-height: 1.2;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+    animation: fadeDown 0.7s ease 0.1s both;
+  }
+
+  header p {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.25rem;
+    font-weight: 300;
+    color: var(--gold-light);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-top: 10px;
+    animation: fadeDown 0.7s ease 0.2s both;
+  }
+
+  .arabic-bismillah {
+    font-family: 'Amiri', serif;
+    font-size: 2rem;
+    color: var(--gold);
+    opacity: 0.6;
+    margin-top: 18px;
+    animation: fadeDown 0.7s ease 0.3s both;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    max-width: 780px;
+    margin: 0 auto 10px;
+    padding: 0 20px;
+    animation: fadeUp 0.7s ease 0.4s both;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 7px;
+    font-weight: 500;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── CONTAINER ── */
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ── QUIZ CARD ── */
+  .quiz-card {
+    background: var(--card-bg);
+    border-radius: 18px;
+    padding: 34px 36px;
+    margin-bottom: 22px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(201,150,58,0.15);
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.6s ease both;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .quiz-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 60px rgba(27,67,50,0.2);
+  }
+
+  .quiz-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 5px; height: 100%;
+    background: linear-gradient(180deg, var(--gold), var(--emerald-light));
+    border-radius: 18px 0 0 18px;
+  }
+
+  .quiz-card::after {
+    content: attr(data-number);
+    position: absolute;
+    top: 20px; right: 24px;
+    font-family: 'Amiri', serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--emerald);
+    opacity: 0.06;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .question-number {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .question-number::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(201,150,58,0.4), transparent);
+  }
+
+  .quiz-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.55;
+    margin-bottom: 24px;
+  }
+
+  /* ── OPTIONS ── */
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 560px) {
+    .options { grid-template-columns: 1fr; }
+    .quiz-card { padding: 26px 22px; }
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 13px 16px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(201,150,58,0.2);
+    background: rgba(201,150,58,0.03);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.92rem;
+    color: #3a2e1a;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option:hover {
+    border-color: var(--gold);
+    background: rgba(201,150,58,0.08);
+    color: var(--emerald);
+  }
+
+  .option input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(201,150,58,0.45);
+    background: white;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .option input[type="radio"]::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%) scale(0);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    transition: transform 0.2s cubic-bezier(.4,0,.2,1);
+  }
+
+  .option input[type="radio"]:checked {
+    border-color: var(--gold);
+    background: rgba(201,150,58,0.08);
+  }
+
+  .option input[type="radio"]:checked::after {
+    transform: translate(-50%,-50%) scale(1);
+  }
+
+  .option:has(input:checked) {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, rgba(201,150,58,0.1), rgba(201,150,58,0.04));
+    color: var(--emerald);
+    font-weight: 500;
+    box-shadow: 0 2px 12px rgba(201,150,58,0.15);
+  }
+
+  .option span {
+    line-height: 1.4;
+  }
+
+  /* ── SUBMIT ── */
+  .submit-box {
+    text-align: center;
+    margin-top: 14px;
+    animation: fadeUp 0.7s ease 0.5s both;
+  }
+
+  .submit-btn {
+    font-family: 'Raleway', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    border: none;
+    border-radius: 60px;
+    padding: 17px 56px;
+    cursor: pointer;
+    box-shadow: 0 6px 28px rgba(201,150,58,0.4), 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.25), transparent);
+    border-radius: inherit;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 12px 40px rgba(201,150,58,0.55), 0 4px 16px rgba(0,0,0,0.12);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  /* Unanswered warning highlight */
+  .quiz-card.unanswered {
+    border-color: rgba(220,80,80,0.5);
+    animation: shake 0.4s ease;
+  }
+
+  /* ── DECORATIVE FOOTER BORDER ── */
+  .footer-border {
+    text-align: center;
+    padding: 30px 20px 0;
+    color: rgba(201,150,58,0.4);
+    font-size: 1.4rem;
+    letter-spacing: 0.5em;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%,60% { transform: translateX(-6px); }
+    40%,80% { transform: translateX(6px); }
+  }
+
+  /* Staggered card animation delays */
+  .quiz-card:nth-child(1)  { animation-delay: 0.10s; }
+  .quiz-card:nth-child(2)  { animation-delay: 0.18s; }
+  .quiz-card:nth-child(3)  { animation-delay: 0.26s; }
+  .quiz-card:nth-child(4)  { animation-delay: 0.34s; }
+  .quiz-card:nth-child(5)  { animation-delay: 0.42s; }
+  .quiz-card:nth-child(6)  { animation-delay: 0.50s; }
+  .quiz-card:nth-child(7)  { animation-delay: 0.58s; }
+  .quiz-card:nth-child(8)  { animation-delay: 0.66s; }
+  .quiz-card:nth-child(9)  { animation-delay: 0.74s; }
+  .quiz-card:nth-child(10) { animation-delay: 0.82s; }
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="{{ url_for('static', filename='logo.png') }}" class="logo" alt="The Afaf Way Logo">
+  <div class="header-ornament">
+    <div class="ornament-line"></div>
+    <span class="ornament-star">✦</span>
+    <div class="ornament-line"></div>
+  </div>
+  <h1>The Afaf Way Islamic Quiz</h1>
+  <p>Test Your Islamic Knowledge</p>
+  <div class="arabic-bismillah">﷽</div>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-label">
+    <span>Your Progress</span>
+    <span id="progress-text">0 / {{ questions|length }} answered</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+</div>
+
+<div class="container">
+  <form action="/result" method="post" id="quiz-form">
+
+    {% for q in questions %}
+    {% set q_index = loop.index0 %}
+
+    <div class="quiz-card" id="card-{{ q_index }}" data-number="{{ loop.index }}">
+      <div class="question-number">Question {{ loop.index }}</div>
+      <h3>{{ q.q }}</h3>
+
+      <div class="options">
+        {% for option in q.options %}
+        <label class="option">
+          <input
+            type="radio"
+            name="q{{ q_index }}"
+            value="{{ option }}"
+            required
+          >
+          <span>{{ option }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% endfor %}
+
+    <div class="submit-box">
+      <button type="submit" class="submit-btn">Submit Quiz</button>
+    </div>
+
+  </form>
+
+  <div class="footer-border">✦ &nbsp; ✦ &nbsp; ✦</div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>
+  // Live progress tracker
+  const total   = document.querySelectorAll('.quiz-card').length;
+  const fill    = document.getElementById('progress-fill');
+  const label   = document.getElementById('progress-text');
+
+  function updateProgress() {
+    const answered = new Set(
+      [...document.querySelectorAll('input[type="radio"]:checked')]
+        .map(r => r.name)
+    ).size;
+    const pct = total ? (answered / total) * 100 : 0;
+    fill.style.width  = pct + '%';
+    label.textContent = answered + ' / ' + total + ' answered';
+  }
+
+  document.getElementById('quiz-form').addEventListener('change', updateProgress);
+
+  // Shake unanswered cards on attempted submit without validation
+  document.getElementById('quiz-form').addEventListener('submit', function(e) {
+    const answered = new Set(
+      [...document.querySelectorAll('input[type="radio"]:checked')]
+        .map(r => r.name)
+    );
+    let allOk = true;
+    document.querySelectorAll('.quiz-card').forEach((card, i) => {
+      if (!answered.has('q' + i)) {
+        card.classList.add('unanswered');
+        setTimeout(() => card.classList.remove('unanswered'), 600);
+        allOk = false;
+      }
+    });
+    if (!allOk) e.preventDefault();
+  });
+</script>
+
+</body>
+</html>
